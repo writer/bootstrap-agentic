@@ -15,7 +15,7 @@ A chat agent with tool-calling capabilities, built with FastAPI, PostgreSQL, and
 ./start.sh
 ```
 
-On first run, this installs dependencies and creates `.env` from the example. Add your API key to `.env` (it will be provided in the email with task instructions), then run `./start.sh` again — it will start Docker, the backend, and the frontend all at once.
+This single command installs dependencies, prompts for your API key (provided in the email with task instructions), starts Docker, and launches the backend + frontend.
 
 Open [http://localhost:3000](http://localhost:3000) to verify the chat interface loads. Press `Ctrl+C` to stop everything.
 

@@ -22,10 +22,21 @@ echo "==> Setting up environment..."
 if [ ! -f .env ]; then
     cp .env.example .env
     echo "    Created .env from .env.example"
-    echo "    ⚠ Add your API key to .env (provided in the email with task instructions) and re-run this script"
-    exit 0
+fi
+
+# Check if API key is set
+if grep -q "LLM_API_KEY=your-api-key-here" .env || grep -q "LLM_API_KEY=$" .env; then
+    echo ""
+    echo "    Enter your WRITER_API_KEY (from the email with task instructions):"
+    read -r API_KEY
+    if [ -z "$API_KEY" ]; then
+        echo "    ⚠ No API key provided. Exiting."
+        exit 1
+    fi
+    sed -i '' "s|LLM_API_KEY=.*|LLM_API_KEY=$API_KEY|" .env
+    echo "    API key saved to .env"
 else
-    echo "    .env already exists"
+    echo "    .env already configured"
 fi
 
 echo ""
