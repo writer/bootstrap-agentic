@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.env
+.venv/
+*.db
+uv.lock
+
+node_modules/
+frontend/dist/
+
+.pytest_cache/
+.mypy_cache/
+.mcp.json
