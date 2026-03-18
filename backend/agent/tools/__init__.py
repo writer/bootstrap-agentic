@@ -30,6 +30,10 @@ def get_registered_tools() -> list[dict]:
     return [entry["schema"] for entry in _tool_registry.values()]
 
 
+# Import tool modules so @register_tool decorators fire
+import backend.agent.tools.calculator  # noqa: F401, E402
+
+
 async def execute_tool(tool_name: str, arguments: str) -> str:
     """Execute a registered tool by name with JSON arguments."""
     if tool_name not in _tool_registry:
