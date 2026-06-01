@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
-set -e
+set -eo pipefail
+
+function exists() {
+  command -v $1 > /dev/null 2>&1
+
+  if [ $? -ne 0 ]; then
+    echo "    $1 is not installed. Please install it and try again."
+    exit 1
+  fi
+
+  echo "    $1 is installed"
+}
 
 cleanup() {
     echo ""
@@ -8,9 +19,20 @@ cleanup() {
     wait $BACKEND_PID $FRONTEND_PID 2>/dev/null
     echo "    Done"
 }
+
 trap cleanup EXIT
 
+exists "docker"
+exists "uv"
+exists "node"
+
 echo "==> Installing backend dependencies..."
+
+if ! [ -d .venv ]; then
+  uv venv
+  source .venv/bin/activate
+fi
+
 uv sync --all-extras
 
 echo ""
