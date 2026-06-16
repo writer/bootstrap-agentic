@@ -5,16 +5,9 @@ the OpenAI SDK.
 
 ## Prerequisites
 
-- Python 3.11+
 - Docker & Docker Compose
-- Node.js 24+ and [`pnpm`](https://npm.im/pnpm)
-- [uv](https://docs.astral.sh/uv/) (Python package manager)
-
-## Windows
-
-Use WSL2. Run all commands from a WSL2 terminal, and **clone this repo inside
-WSL2** (e.g. `~/bootstrap-agentic`), not on your Windows drive (`/mnt/c/...`).
-Docker Desktop must have WSL2 integration enabled for your distro.
+- Node.js 24+ and [`pnpm`](https://npm.im/pnpm) *(auto-installed if missing)*
+- [uv](https://docs.astral.sh/uv/) *(auto-installed if missing)*
 
 ## Quick Setup
 
@@ -22,9 +15,21 @@ Docker Desktop must have WSL2 integration enabled for your distro.
 ./start.sh
 ```
 
-This single command installs dependencies, prompts for your API key (provided in
-the email with task instructions), starts Docker, and launches the backend +
+This single command checks prerequisites (offering to install `node` and `uv` if
+missing), prompts for your API key, starts Docker, and launches the backend +
 frontend.
+
+## Windows
+
+From PowerShell, run:
+
+```powershell
+.\start.ps1
+```
+
+This validates WSL2, Docker, and distro setup, then launches `start.sh` inside
+WSL automatically. For best performance, clone the repo inside WSL
+(`~/bootstrap-agentic`) rather than on your Windows drive (`/mnt/c/...`).
 
 Open [http://localhost:3000](http://localhost:3000) to verify the chat interface
 loads. Press `Ctrl+C` to stop everything.
@@ -57,7 +62,8 @@ uv run pytest
 ├── frontend/                 # React/TypeScript chat UI
 ├── tests/                    # Test suite
 ├── docker-compose.yml        # Postgres + Redis
-├── start.sh                  # One-command setup & run
+├── start.sh                  # One-command setup & run (macOS/Linux/WSL)
+├── start.ps1                 # Windows launcher (validates WSL, runs start.sh)
 └── pyproject.toml            # Python dependencies
 ```
 
