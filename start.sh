@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -o pipefail
 
-function exists() {
-  command -v $1 > /dev/null 2>&1
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+confirm() {
+  local prompt="$1"
+
+  while true; do
+    read -rp "    $prompt [y/n]: " yn
+    case "$yn" in
+      [Yy]*) return 0 ;;
+      [Nn]*) return 1 ;;
+      *) echo "    Please answer y or n." ;;
+    esac
+  done
+}
+
+exists() {
+  command -v "$1" > /dev/null 2>&1
 
   if [ $? -ne 0 ]; then
     echo "    $1 is not installed. Please install it and try again."
@@ -13,7 +28,6 @@ function exists() {
 }
 
 cleanup() {
-    echo ""
     echo "==> Shutting down..."
     kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
     wait $BACKEND_PID $FRONTEND_PID 2>/dev/null
@@ -23,8 +37,58 @@ cleanup() {
 trap cleanup EXIT
 
 exists "docker"
-exists "uv"
-exists "node"
+
+if ! command -v node > /dev/null 2>&1; then
+  echo "    node is not installed."
+  
+  if confirm "Install node via nvm now?"; then
+    export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
+    # nvm is a shell function, not a binary -- source it directly rather than
+    # re-sourcing an rc file (which varies by shell: .bashrc, .zshrc, etc.).
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    nvm install --lts
+
+    if ! command -v node > /dev/null 2>&1; then
+      echo "    node installation failed. Please install it manually and try again."
+      exit 1
+    fi
+
+    echo "    node installed successfully"
+    npm i -g corepack
+    corepack enable
+  else
+    echo "    node is required. Exiting."
+    exit 1
+  fi
+fi
+
+if ! command -v uv > /dev/null 2>&1; then
+  echo "    uv is not installed."
+
+  if confirm "Install uv now?"; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    # The installer creates a sourceable env file; fall back to well-known paths.
+    if [ -f "$HOME/.local/bin/env" ]; then
+      \. "$HOME/.local/bin/env"
+    else
+      export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+    fi
+
+    if ! command -v uv > /dev/null 2>&1; then
+      echo "    uv installation failed. Please install it manually and try again."
+      exit 1
+    fi
+
+    echo "    uv installed successfully"
+  else
+    echo "    uv is required. Exiting."
+    exit 1
+  fi
+else
+  echo "    uv is installed"
+fi
 
 echo "==> Installing backend dependencies..."
 
@@ -37,7 +101,9 @@ uv sync --all-extras
 
 echo ""
 echo "==> Installing frontend dependencies..."
-cd frontend && pnpm install && cd ..
+cd "$SCRIPT_DIR/frontend"
+pnpm install
+cd "$SCRIPT_DIR"
 
 echo ""
 echo "==> Setting up environment..."
@@ -55,7 +121,7 @@ if grep -q "LLM_API_KEY=your-api-key-here" .env || grep -q "LLM_API_KEY=$" .env;
         echo "    ⚠ No API key provided. Exiting."
         exit 1
     fi
-    sed -i '' "s|LLM_API_KEY=.*|LLM_API_KEY=$API_KEY|" .env
+    sed -i "s|LLM_API_KEY=.*|LLM_API_KEY=$API_KEY|" .env
     echo "    API key saved to .env"
 else
     echo "    .env already configured"
