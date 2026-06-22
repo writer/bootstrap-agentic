@@ -1,5 +1,7 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
 import { useEffect, useState } from "react";
-import { createThread, listThreads, Thread } from "./api";
+import { createThread, listThreads, type Thread } from "./api";
 import ChatWindow from "./components/ChatWindow";
 
 export default function App() {

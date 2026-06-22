@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Message, sendMessage } from "../api";
+import { type Message, sendMessage } from "../api";
 import ToolCallDisplay from "./ToolCallDisplay";
 
 interface Props {
@@ -12,10 +12,12 @@ export default function ChatWindow({ threadId }: Props) {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     setMessages([]);
   }, [threadId]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -66,7 +68,7 @@ export default function ChatWindow({ threadId }: Props) {
             <div key={msg.id} className={`message ${msg.role}`}>
               {msg.content}
             </div>
-          )
+          ),
         )}
         {loading && (
           <div className="message assistant" style={{ opacity: 0.5 }}>

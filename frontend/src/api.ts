@@ -40,7 +40,7 @@ export async function createThread(title?: string): Promise<Thread> {
 
 export async function sendMessage(
   threadId: string,
-  message: string
+  message: string,
 ): Promise<ChatResponse> {
   const res = await fetch(`${API_BASE}/threads/${threadId}/chat`, {
     method: "POST",

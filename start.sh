@@ -29,8 +29,8 @@ exists() {
 
 cleanup() {
     echo "==> Shutting down..."
-    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
-    wait $BACKEND_PID $FRONTEND_PID 2>/dev/null
+    kill $PROCESS_PID 2>/dev/null
+    wait $PROCESS_PID 2>/dev/null
     echo "    Done"
 }
 
@@ -40,7 +40,7 @@ exists "docker"
 
 if ! command -v node > /dev/null 2>&1; then
   echo "    node is not installed."
-  
+
   if confirm "Install node via nvm now?"; then
     export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
@@ -56,7 +56,6 @@ if ! command -v node > /dev/null 2>&1; then
     fi
 
     echo "    node installed successfully"
-    npm i -g corepack
     corepack enable
   else
     echo "    node is required. Exiting."
@@ -64,46 +63,10 @@ if ! command -v node > /dev/null 2>&1; then
   fi
 fi
 
-if ! command -v uv > /dev/null 2>&1; then
-  echo "    uv is not installed."
-
-  if confirm "Install uv now?"; then
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    # The installer creates a sourceable env file; fall back to well-known paths.
-    if [ -f "$HOME/.local/bin/env" ]; then
-      \. "$HOME/.local/bin/env"
-    else
-      export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-    fi
-
-    if ! command -v uv > /dev/null 2>&1; then
-      echo "    uv installation failed. Please install it manually and try again."
-      exit 1
-    fi
-
-    echo "    uv installed successfully"
-  else
-    echo "    uv is required. Exiting."
-    exit 1
-  fi
-else
-  echo "    uv is installed"
-fi
-
-echo "==> Installing backend dependencies..."
-
-if ! [ -d .venv ]; then
-  uv venv
-  source .venv/bin/activate
-fi
-
-uv sync --all-extras
-
-echo ""
-echo "==> Installing frontend dependencies..."
-cd "$SCRIPT_DIR/frontend"
-pnpm install
+echo "==> Installing dependencies..."
 cd "$SCRIPT_DIR"
+corepack enable
+pnpm install
 
 echo ""
 echo "==> Setting up environment..."
@@ -140,13 +103,9 @@ echo "    Postgres is ready"
 
 echo ""
 echo "==> Starting backend on http://localhost:8000..."
-uv run uvicorn backend.main:app --reload --port 8000 &
-BACKEND_PID=$!
-
 echo "==> Starting frontend on http://localhost:3000..."
-cd frontend && pnpm dev &
-FRONTEND_PID=$!
-cd ..
+pnpm dev &
+PROCESS_PID=$!
 
 echo ""
 echo "============================================"

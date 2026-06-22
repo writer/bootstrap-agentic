@@ -1,16 +1,12 @@
-__pycache__/
-*.py[cod]
-*.egg-info/
+node_modules/
+.pnpm-store/
+package-lock.json
 dist/
 .env
-.venv/
 *.db
-uv.lock
 
-node_modules/
 frontend/dist/
 
-.pytest_cache/
-.mypy_cache/
 .mcp.json
 *.tsbuildinfo
+AGENTS.md.bak
