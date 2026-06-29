@@ -1,4 +1,4 @@
-# Chat Agent — Interview Starter
+# Chat Agent — Starter
 
 A chat agent with tool-calling capabilities, built with FastAPI, PostgreSQL, and
 the OpenAI SDK.
