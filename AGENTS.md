@@ -32,3 +32,13 @@ Backend: http://localhost:8000 | Frontend: http://localhost:3000
 
 On Windows, run `.\start.ps1` from PowerShell — it validates WSL and launches
 `start.sh` inside WSL.
+
+# Pull request workflow
+
+When asked to "fork the repo and raise a PR", the PR must target **the fork**
+(the user's own copy), not the upstream source it was forked from. Open the PR
+with the fork as the base — e.g. `gh pr create --repo <user>/<repo> --base main
+--head <branch>` — never against the upstream `origin`. Raising it against the
+original repository is wrong: it requests a merge into a repo the user does not
+own and may not intend to contribute to. Only target upstream if the user
+explicitly says so.
