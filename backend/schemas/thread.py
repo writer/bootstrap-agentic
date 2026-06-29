@@ -23,7 +23,7 @@ class MessageResponse(BaseModel):
     id: str
     thread_id: str
     role: str
-    content: int
+    content: str
     tool_call_id: str | None = None
     tool_name: str | None = None
     created_at: datetime
