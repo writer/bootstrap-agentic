@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Message, sendMessage } from "../api";
+import { getMessages, Message, sendMessage } from "../api";
 import ToolCallDisplay from "./ToolCallDisplay";
 
 interface Props {
@@ -14,6 +14,7 @@ export default function ChatWindow({ threadId }: Props) {
 
   useEffect(() => {
     setMessages([]);
+    getMessages(threadId).then(setMessages).catch(console.error);
   }, [threadId]);
 
   useEffect(() => {

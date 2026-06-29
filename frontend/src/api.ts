@@ -38,6 +38,12 @@ export async function createThread(title?: string): Promise<Thread> {
   return res.json();
 }
 
+export async function getMessages(threadId: string): Promise<Message[]> {
+  const res = await fetch(`${API_BASE}/threads/${threadId}/messages`);
+  if (!res.ok) throw new Error("Failed to fetch messages");
+  return res.json();
+}
+
 export async function sendMessage(
   threadId: string,
   message: string

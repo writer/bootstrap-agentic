@@ -40,6 +40,20 @@ async def get_thread(thread_id: str, db: AsyncSession = Depends(get_db)):
     return thread
 
 
+@router.get("/{thread_id}/messages", response_model=list[MessageResponse])
+async def get_thread_messages(thread_id: str, db: AsyncSession = Depends(get_db)):
+    thread = await db.get(Thread, thread_id)
+    if not thread:
+        raise HTTPException(status_code=404, detail="Thread not found")
+
+    result = await db.execute(
+        select(Message)
+        .where(Message.thread_id == thread_id)
+        .order_by(Message.created_at)
+    )
+    return result.scalars().all()
+
+
 @router.post("/{thread_id}/chat", response_model=ChatResponse)
 async def chat(
     thread_id: str, body: ChatRequest, db: AsyncSession = Depends(get_db)

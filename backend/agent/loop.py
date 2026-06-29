@@ -18,9 +18,13 @@ async def run_agent(thread_id: str, user_message: str, db: AsyncSession) -> str:
     )
     history = result.scalars().all()
 
-    # Build messages for the LLM
+    # Build messages for the LLM. Intermediate tool turns aren't persisted with
+    # their originating assistant tool_calls, so replaying a bare tool message
+    # would be rejected by the API — only replay user/assistant text turns.
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     for msg in history:
+        if msg.role == "tool" or not msg.content:
+            continue
         messages.append({"role": msg.role, "content": msg.content})
 
     messages.append({"role": "user", "content": user_message})
